@@ -1,0 +1,347 @@
+---
+title: "Week1_R"
+author: "Akhila"
+date: "5/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Console Input and Evaluation
+```{r}
+x <- 5
+print(x) #explicit printing
+x #autoprinting
+msg <- "hello"
+msg
+#create sequence (integers) with :
+x1 <- 1:20
+x1
+
+x2<- 0:10
+x2
+class(x2)
+as.numeric(x2)
+as.logical(x2)
+as.character(x2)
+
+x3<-c("a","b","c")
+as.numeric(x3)
+
+x4<- list(1,"a",FALSE,1+4i)
+
+x4
+
+x4[2]
+```
+
+# Matrices
+```{r}
+mat<- matrix(nrow=3,ncol=3)
+mat
+
+mat1 <- matrix(1:9,nrow=3,ncol=3)
+mat1
+mat1[3,3]
+dim(mat1)
+
+attributes(mat1)
+
+mat2 <- 1:9
+mat2
+dim(mat2) <- c(3,3)
+mat2
+
+vect1<- 1:3
+vect2<- 10:12
+
+cbind(vect1,vect2)
+rbind(vect1,vect2)
+
+cbind(mat2,vect2)
+```
+
+# Factors
+```{r}
+f <- factor(c("y","y","n","y","n","y"))
+f
+table(f)
+unclass(f)
+f1 <- factor(c("y","y","n","y","n","y"),levels=c("y","n"))
+f1
+
+```
+
+
+# Missing values NA and NaNs
+```{r}
+
+miss1 <- c(1,2,NA,4)
+miss1
+is.na(miss1)
+is.nan(miss1)
+miss2 <- c(1,2,NaN,6,NA,4)
+is.na(miss2)
+is.nan(miss2)
+```
+
+# Attributes
+```{r}
+df <- data.frame(f=0:3,b=c(F,T,T,T))
+df
+ncol(df)
+nrow(df)
+row.names.data.frame(df)
+df
+
+nam <- c(1,2,3)
+nam
+names(nam)
+names(nam)<- c("1","2","3")
+nam1 <- list(a=1,b=3,c=5)
+nam1
+mat1
+dimnames(mat1)<- list(c(1,2,3),c(10,11,12))
+dimnames(mat1)
+```
+
+# Reading and writing data
+```{r}
+t1<- read.table("foo.txt",sep=",",header = F)
+t1
+
+t2 <- read.table("foo.txt",sep=",",header = F,nrows=5)
+c2<- sapply(t2,class)
+tfinal <- read.table("foo.txt",sep=",",header = F, colClasses = c("integer","factor","numeric"))
+tfinal
+c2
+
+library(readr)
+t3 <- read_csv("foo.txt",col_types = "ici",progress = T)
+t3
+```
+
+```{r}
+df
+dput(df, "df.R")
+new.df<- dget("df.R")
+new.df
+tfinal
+dump(c("tfinal","df"),file="df1.R")
+rm(tfinal,df)
+#tfinal
+source("df1.R")
+tfinal
+df
+```
+```{r}
+a <- data.frame(x = rnorm(100), y = runif(100))
+b <- c(3, 4.4, 1 / 3)
+a
+b
+save(a, b, file = "mydata.rda")
+rm(a,b)
+#a
+load("mydata.rda")
+a
+```
+
+# Connections
+```{r}
+str(file)
+```
+
+# Subsetting
+```{r}
+subset1 <- c("a", "b", "c", "c", "d", "a")
+subset1[1:3]
+subset1[c(1,3,5)]
+subset1[subset1>"b"]
+
+subsetmat <- matrix(1:9,nrow=3,ncol=3)
+
+subsetmat
+
+subsetmat[2,2]
+class(subsetmat[2,2])
+
+subsetmat[2,2,drop=F]
+class(subsetmat[2,2,drop=F])
+
+subsetmat[1,]
+class(subsetmat[1,])
+
+subsetmat[1, ,drop=F]
+class(subsetmat[1, ,drop=F])
+
+subsetmat[,1]
+class(subsetmat[,1])
+
+subsetmat[ ,1,drop=F]
+class(subsetmat[ ,1,drop=F])
+
+
+subsetlist <- list(foo = 1:4, bar = 0.7)
+subsetlist
+
+subsetlist$foo
+subsetlist[["foo"]]
+
+#[[ ]] can be used with computed ones whereas $ can be used only with literal names
+indices <- "foo"
+subsetlist$indices
+subsetlist[[indices]]
+
+subsetnestedlist <- list(a = list(10, 12, 14), b = c(3.14, 2.81))
+class(subsetnestedlist$a)
+subsetnestedlist[[c(1,3)]]
+class(subsetnestedlist[[c(1,3)]])
+subsetnestedlist[[1]][[3]]
+subsetnestedlist[[c(2,1)]]
+class(subsetnestedlist[[2]][[1]])
+subsetnestedlist[[2]][[1]]
+
+subsetnestedlist1 <- list(a = list(10, 12, 14), b = c(3.14, 2.81), d=c(T,F,T,T))
+
+subsetnestedlist1[c(1,3)]
+class(subsetnestedlist1[c(1,3)])
+
+subsetnestedlist1[[c(1,3)]]
+
+```
+
+# Partial matching
+```{r}
+pm <- list(aarthy=c(23,04,2000))
+pm$a
+pm[["a"]]
+pm[["a",exact=F]]
+```
+
+# Removing NAN values
+```{r}
+missnan <- c(1,2,NA,6,NA,4)
+bad <- is.na(missnan)
+bad
+missnan[!bad]
+#help("complete.cases")
+#Return a logical vector indicating which cases are complete, i.e., have no missing values.
+good <- complete.cases(missnan)
+good
+missnan[good]
+
+missnan1 <- c(1,2,NA,6,NA,4)
+missnan2 <- c(NA,"b","a",NA,"c",NA)
+#OR ing of 1 and NA results in FALSE, OR ing of 2 and "b" returns TRUE
+good1 <- complete.cases(missnan1,missnan2)
+good1
+missnan1[good1]
+missnan2[good1]
+is.na(head(airquality))
+complete.cases(head(airquality))
+good2 <- complete.cases(airquality)
+head(airquality[good2, ])
+head(airquality[!good2,])
+```
+
+# Vectorized
+```{r}
+v1 <- 1:4
+v2 <- 5:8
+v1
+v2
+v1+v2
+v1-v2
+v1*v2
+v1/v2
+v1>2
+v2==8
+mat1
+mat2<- matrix(rep(10,9),3,3)
+mat2
+mat1+mat2
+mat1-mat2
+mat1*mat2
+mat1/mat2
+
+mat1%*%mat2
+
+```
+
+# Quiz
+```{r}
+x <- 4L
+x <- c(4,TRUE)
+x
+class(x)
+x<-c(1,3,5)
+y<-c(3,2,10)
+class(cbind(x,y))
+x<- list(2, "a", "b", TRUE)
+length(x[[2]]) 
+class(x[[2]])
+
+x <- 1:4
+y <- 2
+x
+y
+x+y
+
+x <- c(3, 5, 1, 10, 12, 6)
+x[x<6]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x<6]==0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x>6]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x<=5]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x%in%1:5]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x!=6]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x==6]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x>=6]<-0
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x==0]<-6
+x
+x <- c(3, 5, 1, 10, 12, 6)
+x[x==0]<-6
+x
+```
+
+# 11-20
+
+```{r}
+hw1 <- read.csv("hw1_data.csv",header=T)
+tail(hw1)
+hw1[47, ]
+bad <- is.na(hw1[["Ozone"]])
+hw1[!complete.cases(hw1$Ozone), ]
+hw2<-hw1[complete.cases(hw1$Ozone), ]
+mean(hw2$Ozone)
+#hw3 <- hw1[hw1$Ozone>31 & hw1$Temp>90, ]
+hw3 <- hw1[which(hw1$Ozone>31 & hw1$Temp>90), ]
+hw3
+mean(hw3$Solar.R)
+
+hw4<- hw1[which(hw1$Month==6), ]
+mean(hw4$Temp)
+
+hw5<- hw1[which(hw1$Month==5), ]
+max(hw5$Ozone,na.rm=T)
+```
+
+
+

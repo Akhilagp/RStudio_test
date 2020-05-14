@@ -1,0 +1,306 @@
+---
+title: "Week2_R"
+author: "Akhila"
+date: "5/6/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Control Structures
+
+## if-else
+
+```{r}
+#genearting a random uniform number
+#syntax: runif(n,min,max)
+x<-runif(1, 0, 10)
+#help(runif)
+if(x>5){
+  y<-10
+  } else{
+  y<-23
+  }
+
+
+x1<-runif(1, 6, 10)
+#help(runif)
+y1<- if(x1>5){
+  10
+}else {
+  23
+  }
+
+x
+x1
+y
+y1
+```
+## for loop
+
+```{r}
+loop1 <- 1:10
+
+for(i in loop1){
+  print(i)
+}
+for(i in seq_along(loop1)){
+  print(loop1[i])
+}
+
+loop2 <- c("a","e","i","o","u")
+for(letter in loop2){
+  print(letter)
+}
+for (i in seq_along(loop2)) {
+  print(loop2[i])
+}
+```
+## nested for
+
+```{r}
+mat <- matrix(1:9,nrow=3,ncol=3)
+#help("seq_along")== length of the argument
+#help("seq_len")== length of the argument's sequence
+#Examples
+nrow(mat) #3
+seq_len(nrow(mat)) #gen 1:3
+seq_along(nrow(mat)) #gen 1
+for(i in seq_len(nrow(mat))){
+  for(j in seq_len(ncol(mat))){
+    print(mat[i,j])
+  }
+}
+```
+
+## while
+```{r}
+c <-0
+while(c<10){
+  print(c)
+  c<- c+1
+}
+c
+#help("rbinom")
+#binomial distribution
+#rbinom(n,size,prob) no of obs, no of trials, prob of success
+z<-5
+while(z>=3 && z<=10){
+  l<-runif(1,0,10)
+  print(l)
+  print(z)
+  if(l>5){
+    z<-z-1
+  } else {
+    z<- z+1
+  }
+}
+z
+```
+
+# next, break
+```{r}
+loop3<- 1:20
+for (i in loop3 ) {
+  if(i<10){
+    next
+  } else {
+    print("ILY")
+  }
+}
+
+for (i in loop3 ) {
+  if(i<10){
+    break
+  } else {
+    print("ILY")
+  }
+}
+```
+# functions
+
+```{r}
+f1 <- function(){
+  cat("Annayegaseyo\n")
+}
+class(f1)
+
+f2 <- function(rpt){
+  for (var in seq_len(rpt)) {
+    cat("Annayegaseyo\n")
+  }
+}
+
+f2(4)
+
+#the last expression is returned
+f3 <- function(x,y){
+  print(x)
+  print(y)
+}
+f3(5)
+f4 <- function(x,y=9){
+  x+y
+}
+
+z<-f3(x=5,y=7)
+z1<- f4(5)
+z
+z1
+formals(fun=f3)
+```
+
+## Argument matching
+
+```{r}
+str(rnorm)
+md<-rnorm(10,mean=0.5,sd=1)
+str(sd)
+sd(na.rm = F,x=md)
+str(lm)
+```
+
+# Samples
+```{r}
+above10 <- function(x,n=10){
+  x[x>n]
+}
+above10(2:18)
+above10(2:18,11)
+
+columnmean <- function(df,removeNA=T){
+  mean_ <- numeric(ncol(df))
+  for (i in seq_len(ncol(df))) {
+    mean_[i] <- mean(df[ ,i], na.rm =removeNA) 
+  }
+  mean_
+}
+
+me <- columnmean(airquality, F)
+me
+head(airquality)
+```
+
+```{r}
+make.power <- function(n){
+  pow <- function(n1){
+    n1^n
+  }
+  pow
+}
+
+cube <- make.power(3)
+cube(5)
+square <- make.power(2)
+square(5)
+ls(environment(cube))
+get("n",environment(cube))
+```
+
+```{r}
+y<-10
+
+f <- function(x){
+  y<-2
+  y^2 + g(x)
+}
+
+g <- function(x){
+  x*y
+}
+
+f(3)
+#in lexical scoping value of y in g() will be the env in it was defined say GlobalEnv
+#in dynamic scoping value of y in g() will be the env from which it was called say from f()
+
+
+```
+
+# Dates and times
+
+```{r}
+date1 <- "2020-08-28"
+class(date1)
+date12 <- as.Date(date1)
+date12
+# no of days since jan 1st, 1970
+unclass(date12)
+time1 <- Sys.time()
+class(time1)
+names(unclass(time1))
+time12 <- as.POSIXlt(time1)
+class(time12)
+names(unclass(time12))
+time12$zone
+#help("strptime")
+datestr <- "August 28, 1998 10:00 PM"
+datestr1 <- strptime(datestr,"%B %d, %Y %I:%M %p")
+class(datestr1)
+datestr1
+
+time2 <- as.POSIXct("2012-10-25 01:00:00",tz="IST")
+time21 <- as.POSIXct("2012-10-25 06:00:00", tz = "KST")
+time21-time2
+```
+
+# Quiz
+
+```{r}
+cube <- function(x, n) {
+        x^3
+}
+
+cube(3)
+
+x <- 1:10
+x <- 0
+
+if(x > 5) {
+        x <- 0
+}
+
+f <- function(x) {
+        print("1")
+        g <- function(y) {
+            print("2")    
+            y + z
+        }
+        print("3")
+        z <- 4
+        print("4")
+        x + g(x)
+}
+z <- 10
+f(3)
+
+x <- 5
+y <- if(x < 3) {
+        NA
+} else {
+        10
+}
+y
+  h <- function(x, y = NULL, d = 3L) {
+          z <- cbind(x, d)
+          if(!is.null(y))
+                  z <- z + y
+          else
+                  z <- z + f10
+          g <- x + y / z
+          if(d == 3L)
+                  return(g)
+          g <- g + 10
+          g
+  }
+  ls(environment(h))
+
+```
+
+# Programming Assignment Quiz
+
+```{r}
+
+```
+

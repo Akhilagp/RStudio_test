@@ -1,0 +1,43 @@
+---
+title: "Week3_R"
+author: "Akhila"
+date: "5/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loop functions
+## lapply()
+
+```{r}
+x <- list(a = c(1,2,3,4,NA), b = rnorm(10), c = rnorm(20, 1), d = rnorm(100, 5))
+lapply(x, mean)
+sapply(x, mean,na.rm=T)
+
+x1 <- c(1,2,3,4)
+unclass(x1)
+summa1 <- function(summa){
+  #print(summa)
+  #runif(summa,5,8)
+}
+lapply(x1, runif,5,8)
+x2 <- list(a=matrix(1:9,3,3),b=matrix(1:6,3,2))
+x2
+lapply(x2, function(el) { el[, 2]})
+sapply(x2, function(el) { el[, 2]})
+
+s <- split(airquality, airquality$Month)
+s
+
+lapply(s, function(x) {
+  apply(x[, c("Ozone", "Solar.R", "Wind")],2,mean,na.rm = T )
+})
+sapply(s, function(x) {
+  colMeans(x[, c("Ozone", "Solar.R", "Wind")],na.rm = T )
+})
+
+apply(airquality[ ,c("Ozone","Solar.R","Wind")], 2, mean)
+```

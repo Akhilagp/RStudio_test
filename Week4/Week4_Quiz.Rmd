@@ -1,0 +1,174 @@
+```{r}
+x <-rnorm(20,0,1)
+summary(x)
+pnorm(10,0,1)
+```
+p calculates cumulative distribution functions
+pnorm(q) = phi(q)
+qnorm(p) = phi^-1(p)
+
+```{r}
+set.seed(1)
+rnorm(10)
+rnorm(10)
+```
+set.seed() reproduce random numbers
+
+```{r}
+set.seed(10)
+x <- rep(0:1, each = 5)
+x
+e <- rnorm(10, 0, 20)
+e
+y <- 0.5 + 2 * x + e
+y
+plot(x,y)
+```
+
+```{r}
+system.time(read.csv(file = "specdata/001.csv"))
+hilbert <- function(n) {
+i <- 1:n
+1 / outer(i - 1, i, "+")
+}
+x <- hilbert(1000)
+system.time(
+  svd(x)
+)
+system.time(readLines("https://www.jhsph.edu"))
+```
+user time(CPU time) > elapsed(wallclock time), because linear algebra models use multi-threading/processors
+user time(CPU time) < elapsed(wallclock time), because readLines takes smaller CPU time for execution, but the network part on bringing data from the webpage takes the rest of the time.
+
+```{r}
+read.csv("specdata/001.csv")
+Rprof()
+x <- read.csv("specdata/001.csv")
+Rprof(NULL)
+summaryRprof()
+
+```
+
+
+# Programming Assignment
+
+## Actual solution is in Week 4 folder
+```{r eval=FALSE, include=FALSE}
+rout <- function(out){
+#outcome_temp<- read.csv("op_pgass3.csv",colClasses = "character")
+outcome_temp <- read.csv("rprog_data_ProgAssignment3-data/outcome-of-care-measures.csv", colClasses = "character")
+names(outcome_temp)[11] <- "heart attack"
+names(outcome_temp)[17] <- "heart failure"
+names(outcome_temp)[23] <- "pneumonia"
+outcome_temp <- outcome_temp[,c(2,7,11,17,23)]
+outcome_temp[outcome_temp=="Not Available"] <- NA
+outcome_temp$`heart attack`<- as.numeric(outcome_temp$`heart attack`)
+outcome_temp$`heart failure`<- as.numeric(outcome_temp$`heart failure` )
+outcome_temp$pneumonia <- as.numeric(outcome_temp$pneumonia )
+
+outcome_temp[ , c("Hospital.Name","State",out)]
+}
+
+bestq <- function(st,out){
+
+outcome_temp <- rout(out)
+
+outcomes_list = c("heart attack","heart failure","pneumonia")
+if(! out %in% outcomes_list) stop("invalid outcome")
+#outcome_temp <- read.csv("op_pgass3.csv",colClasses = "character")
+
+state_list <- unique(outcome_temp$State)
+if (! st %in% state_list) stop("invalid state")
+
+op1 <- outcome_temp[outcome_temp$State==st, ]
+op1 <- na.omit(op1)
+op1[order(op1[out],op1$Hospital.Name), ]$Hospital.Name[1]
+}
+
+rankHospital <- function(st,out,num="best"){
+outcome_temp <- rout(out)
+outcomes_list = c("heart attack","heart failure","pneumonia")
+if(! out %in% outcomes_list) stop("invalid outcome")
+
+state_list <- unique(outcome_temp$State)
+if (! st %in% state_list) stop("invalid state")
+
+op1 <- outcome_temp[outcome_temp$State==st, ]
+op1 <- na.omit(op1)
+op1$rank <- NA
+op1$rank[order(op1[out],op1$Hospital.Name)] <- 1:nrow(op1)
+if(num=="best")
+{
+  num <- min(op1$rank)
+} else if(num=="worst") {
+  num <- max(op1$rank)
+}
+
+op1[op1$rank==num, ]$Hospital.Name[1]
+
+}
+
+rankall <- function(out,num="best"){
+  outcome_temp<- rout(out)
+  outcomes_list = c("heart attack","heart failure","pneumonia")
+  if(! out %in% outcomes_list) stop("invalid outcome")
+  
+   getnum <- function(df_col){
+    if(num=="best")
+    {
+      num <- min(df_col)
+    } else if(num=="worst") {
+      num <- max(df_col)
+    } else{
+      num
+    }
+ }
+  
+  op_df <- data.frame()
+  vect<- vector()
+  op_df
+  for (st in split(outcome_temp,outcome_temp$State)) {
+    
+    st <- na.omit(st)
+    st$rank <- NA
+    st$rank[order(st[out],st$Hospital.Name)] <- 1:nrow(st)
+    num1 <- getnum(st$rank)
+    st_1 <- st[st$rank==num1, ]
+    
+    op_df <- rbind(op_df, data.frame(hospital=st_1$Hospital.Name[1],state =st$State[1]))
+  }
+    
+    rownames(op_df) <- op_df$state
+    #print(rownames(op_df))
+    op_df
+    #split(outcome_temp,outcome_temp$State)
+}
+
+head(rankall("heart attack", 20), 10)
+tail(rankall("pneumonia", "worst"), 3)
+tail(rankall("heart failure"), 10)
+rankall("heart attack",4)
+
+r <- rankall("heart attack", 4)
+as.character(subset(r, state == "HI")$hospital)
+r <- rankall("pneumonia", "worst")
+as.character(subset(r, state == "NJ")$hospital)
+r <- rankall("heart failure", 10)
+as.character(subset(r, state == "NV")$hospital)
+
+bestq("AL","heart attack")
+bestq("SC", "heart attack")
+bestq("NY", "pneumonia")
+bestq("AK", "pneumonia")
+rankHospital("TX","heart failure",4)
+rankHospital("MD", "heart attack", "worst")
+rankHospital("MN", "heart attack", 5000)
+rankHospital("NC", "heart attack", "worst")
+rankHospital("WA", "heart attack", 7)
+rankHospital("TX", "pneumonia", 10)
+rankHospital("NY", "heart attack", 7)
+rankHospital("AK","heart attack",20)
+rankHospital("WI", "pneumonia", "worst")
+```
+
+
